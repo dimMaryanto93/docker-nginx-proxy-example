@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  mits-ui:
+    image: "nginx"
+    ports:
+     - "80:80"
+     - "81:81"
+    volumes:
+      - ./nginx.proxy.conf:/etc/nginx/nginx.conf
+      - ./registration/dist/registration/:/var/www/html/mits/registration/
+      - ./script/dist/script/:/var/www/html/mits/script/
+    depends_on:
+      - api-mits
+  db-mysql:
+    image: "mysql:5.7"
+    ports: 
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=passwordnyaRoot
+      - MYSQL_DATABASE=mits
+      - MYSQL_USER=mits
+      - MYSQL_PASSWORD=mits
+  api-mits:
+    image: "jboss/wildfly"
+    volumes: 
+      - ./login.war:/opt/jboss/wildfly/standalone/deployments/login.war
+    ports:
+      - "9990:9990"
+      - "10000:8080"
+    depends_on:
+      - db-mysql
